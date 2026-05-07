@@ -1,6 +1,6 @@
 package com.Clansystem.invite;
 
-import com.clans.ClansPlugin;
+import com.Clansystem.ClansPlugin;
 import com.Clansystem.Model.Clan;
 import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.ChatColor;
