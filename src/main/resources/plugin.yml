@@ -1,6 +1,6 @@
 name: ClansPlugin
 version: 1.0.0
-main: com.clans.ClansPlugin
+main: com.Clansystem.ClansPlugin
 api-version: 1.20
 author: YourName
 description: Clan system with per-world support, economy, PlaceholderAPI
