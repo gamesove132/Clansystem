@@ -1,6 +1,6 @@
 package com.Clansystem.Manager;
 
-import com.clans.ClansPlugin;
+import com.Clansystem.ClansPlugin;
 import com.Clansystem.Model.Clan;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
