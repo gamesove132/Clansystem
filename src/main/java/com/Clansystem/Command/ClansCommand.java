@@ -1,6 +1,6 @@
 package com.Clansystem.Command;
 
-import com.clans.ClansPlugin;
+import com.Clansystem.ClansPlugin;
 import com.Clansystem.Model.Clan;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
