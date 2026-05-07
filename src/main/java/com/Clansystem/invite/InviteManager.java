@@ -1,4 +1,4 @@
-package com.clans.managers;
+package com.Clansystem.invite;
 
 import com.clans.ClansPlugin;
 import com.Clansystem.Model.Clan;
