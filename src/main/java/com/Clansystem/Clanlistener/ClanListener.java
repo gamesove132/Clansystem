@@ -1,6 +1,6 @@
 package com.Clansystem.Clanlistener;
 
-import com.clans.ClansPlugin;
+import com.Clansystem.ClansPlugin;
 import com.Clansystem.Model.Clan;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
