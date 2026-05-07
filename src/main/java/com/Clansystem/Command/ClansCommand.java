@@ -1,7 +1,7 @@
 package com.clans.commands;
 
 import com.clans.ClansPlugin;
-import com.clans.model.Clan;
+import com.Clansystem.Model.Clan;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
