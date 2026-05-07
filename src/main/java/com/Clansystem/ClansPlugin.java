@@ -1,8 +1,8 @@
 package com.Clansystem;
 
-import com.clans.commands.ClansCommand;
-import com.clans.listeners.ClanListener;
-import com.clans.managers.ClanManager;
+import com.Clansystem.Command.ClansCommand;
+import com.Clansystem.Clanlistener.ClanListener;
+import com.Clansystem.Manager.ClanManager;
 import com.Clansystem.invite.InviteManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
