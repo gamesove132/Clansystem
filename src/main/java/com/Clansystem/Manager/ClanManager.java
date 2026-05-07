@@ -1,7 +1,7 @@
 package com.clans.managers;
 
 import com.clans.ClansPlugin;
-import com.clans.model.Clan;
+import com.Clansystem.Model.Clan;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
