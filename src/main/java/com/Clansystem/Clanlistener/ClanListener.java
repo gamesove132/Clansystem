@@ -1,4 +1,4 @@
-package com.clans.listeners;
+package com.Clansystem.Clanlistener;
 
 import com.clans.ClansPlugin;
 import com.Clansystem.Model.Clan;
