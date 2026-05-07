@@ -1,7 +1,7 @@
 package com.clans.placeholders;
 
 import com.clans.ClansPlugin;
-import com.clans.model.Clan;
+import com.Clansystem.Model.Clan;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
