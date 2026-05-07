@@ -48,7 +48,7 @@ public class ClansPlugin extends JavaPlugin {
 
         // PlaceholderAPI
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new com.clans.placeholders.ClansExpansion(this).register();
+            new com.Clansystem.Expansion.ClansExpansion(this).register();
             getLogger().info("PlaceholderAPI — плейсхолдери зареєстровано!");
         }
 
