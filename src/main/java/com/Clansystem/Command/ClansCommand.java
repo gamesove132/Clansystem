@@ -1,4 +1,4 @@
-package com.clans.commands;
+package com.Clansystem.Command;
 
 import com.clans.ClansPlugin;
 import com.Clansystem.Model.Clan;
