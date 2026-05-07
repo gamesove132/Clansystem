@@ -1,7 +1,7 @@
 package com.clans.managers;
 
 import com.clans.ClansPlugin;
-import com.clans.model.Clan;
+import com.Clansystem.Model.Clan;
 import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
