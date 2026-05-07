@@ -1,4 +1,4 @@
-package com.clans.placeholders;
+package com.Clansystem.Expansion;
 
 import com.clans.ClansPlugin;
 import com.Clansystem.Model.Clan;
