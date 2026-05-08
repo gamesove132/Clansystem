@@ -2,6 +2,7 @@ package com.Clansystem.Manager;
 
 import com.Clansystem.ClansPlugin;
 import com.Clansystem.Model.Clan;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -13,9 +14,8 @@ import java.util.*;
 public class ClanManager {
 
     private final ClansPlugin plugin;
-    // clanId -> Clan
     private final Map<String, Clan> clans = new HashMap<>();
-    // UUID -> clanId (per world: uuid_world -> clanId)
+    // ключ: uuid_world -> clanId
     private final Map<String, String> playerClanMap = new HashMap<>();
 
     private File dataFile;
@@ -33,44 +33,65 @@ public class ClanManager {
         }
         data = YamlConfiguration.loadConfiguration(dataFile);
 
-        if (!data.contains("clans")) return;
+        ConfigurationSection clansSection = data.getConfigurationSection("clans");
+        if (clansSection == null) return;
 
-        for (String id : data.getConfigurationSection("clans").getKeys(false)) {
-            String path = "clans." + id;
-            String name = data.getString(path + ".name");
-            UUID owner = UUID.fromString(data.getString(path + ".owner"));
-            String world = data.getString(path + ".world");
-            long createdAt = data.getLong(path + ".created-at", 0);
+        // getKeys(false) на ConfigurationSection — не плутається з крапками в ключах
+        for (String id : clansSection.getKeys(false)) {
+            ConfigurationSection c = clansSection.getConfigurationSection(id);
+            if (c == null) continue;
+
+            String name = c.getString("name");
+            String ownerStr = c.getString("owner");
+            String world = c.getString("world");
+            long createdAt = c.getLong("created-at", 0);
+
+            if (name == null || ownerStr == null || world == null) {
+                plugin.getLogger().warning("Пропускаємо клан з неповними даними: " + id);
+                continue;
+            }
+
+            UUID owner;
+            try { owner = UUID.fromString(ownerStr); }
+            catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("Невірний UUID власника для клану: " + id);
+                continue;
+            }
 
             Set<UUID> members = new HashSet<>();
-            List<String> memberList = data.getStringList(path + ".members");
-            for (String m : memberList) members.add(UUID.fromString(m));
+            for (String m : c.getStringList("members")) {
+                try { members.add(UUID.fromString(m)); }
+                catch (IllegalArgumentException ignored) {}
+            }
 
             Clan clan = new Clan(id, name, owner, world, members, createdAt);
             clans.put(id, clan);
-
             for (UUID member : members) {
-                playerClanMap.put(member.toString() + "_" + world, id);
+                playerClanMap.put(playerKey(member, world), id);
             }
         }
+        plugin.getLogger().info("Завантажено " + clans.size() + " кланів.");
     }
 
     public void saveAll() {
+        // Очищаємо секцію
         data.set("clans", null);
+
         for (Clan clan : clans.values()) {
-            String path = "clans." + clan.getId();
-            data.set(path + ".name", clan.getName());
-            data.set(path + ".owner", clan.getOwner().toString());
-            data.set(path + ".world", clan.getWorld());
-            data.set(path + ".created-at", clan.getCreatedAt());
+            // Використовуємо ConfigurationSection щоб уникнути проблем з крапками в ключах
+            ConfigurationSection c = data.createSection("clans." + clan.getId());
+            c.set("name", clan.getName());
+            c.set("owner", clan.getOwner().toString());
+            c.set("world", clan.getWorld());
+            c.set("created-at", clan.getCreatedAt());
             List<String> members = new ArrayList<>();
             for (UUID m : clan.getMembers()) members.add(m.toString());
-            data.set(path + ".members", members);
+            c.set("members", members);
         }
+
         try { data.save(dataFile); } catch (IOException e) { e.printStackTrace(); }
     }
 
-    // Ключ для мапи гравець+світ
     private String playerKey(UUID uuid, String world) {
         return uuid.toString() + "_" + world;
     }
@@ -92,8 +113,18 @@ public class ClanManager {
     }
 
     public Clan getPlayerClan(UUID uuid, String world) {
+        // Спочатку точний збіг по світу
         String id = playerClanMap.get(playerKey(uuid, world));
-        return id != null ? clans.get(id) : null;
+        if (id != null) return clans.get(id);
+
+        // Фолбек — будь-який клан цього UUID (для TAB/scoreboard)
+        String prefix = uuid.toString() + "_";
+        for (Map.Entry<String, String> entry : playerClanMap.entrySet()) {
+            if (entry.getKey().startsWith(prefix)) {
+                return clans.get(entry.getValue());
+            }
+        }
+        return null;
     }
 
     public Clan getPlayerClan(Player player) {
@@ -113,7 +144,7 @@ public class ClanManager {
     }
 
     public void disbandClan(Clan clan) {
-        for (UUID member : clan.getMembers()) {
+        for (UUID member : new HashSet<>(clan.getMembers())) {
             playerClanMap.remove(playerKey(member, clan.getWorld()));
         }
         clans.remove(clan.getId());
@@ -133,13 +164,17 @@ public class ClanManager {
     }
 
     public void renameClan(Clan clan, String newName) {
-        // Видаляємо старий id
-        clans.remove(clan.getId());
-        // Оновлюємо мапу гравців
-        for (UUID member : clan.getMembers()) {
-            playerClanMap.put(playerKey(member, clan.getWorld()), clan.getWorld() + "_" + newName.toLowerCase());
+        String oldId = clan.getId();
+        clans.remove(oldId);
+
+        String newId = clan.getWorld() + "_" + newName.toLowerCase();
+        for (Map.Entry<String, String> entry : playerClanMap.entrySet()) {
+            if (entry.getValue().equals(oldId)) {
+                entry.setValue(newId);
+            }
         }
-        clan.setName(newName);
+
+        clan.setName(newName); // оновлює і id і name
         clans.put(clan.getId(), clan);
         saveAll();
     }
