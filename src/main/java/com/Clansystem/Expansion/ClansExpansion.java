@@ -3,17 +3,12 @@ package com.Clansystem.Expansion;
 import com.Clansystem.ClansPlugin;
 import com.Clansystem.Model.Clan;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * %clansystem%        - назва клану гравця (або порожньо)
- * %clansystem_name%   - назва клану
- * %clansystem_size%   - кількість членів
- * %clansystem_owner%  - власник клану
- * %clansystem_role%   - роль: Власник / Учасник
- */
 public class ClansExpansion extends PlaceholderExpansion {
 
     private final ClansPlugin plugin;
@@ -31,20 +26,26 @@ public class ClansExpansion extends PlaceholderExpansion {
     public String onPlaceholderRequest(Player player, @NotNull String params) {
         if (player == null) return "";
 
+        // Шукаємо клан — getPlayerClan вже має fallback по всіх світах
         Clan clan = plugin.getClanManager().getPlayerClan(player);
         String clanColor = plugin.getConfig().getString("clan-color", "&6");
+        String noClan = plugin.getConfig().getString("messages.no-clan-placeholder", "Без клану");
 
-        if (params.equals("") || params.equals("name")) {
-            if (clan == null) return plugin.getConfig().getString("messages.no-clan-placeholder", "Без клану");
+        if (params.isEmpty() || params.equals("name")) {
+            if (clan == null) return ChatColor.translateAlternateColorCodes('&', noClan);
             return ChatColor.translateAlternateColorCodes('&', clanColor + clan.getName());
         }
 
-        if (clan == null) return "";
+        // Якщо клану нема — повертаємо порожньо для решти
+        if (clan == null) {
+            if (params.equals("size") || params.equals("role") || params.equals("owner") || params.equals("tag")) return "";
+            return "";
+        }
 
         return switch (params) {
             case "size" -> String.valueOf(clan.getSize());
             case "owner" -> {
-                org.bukkit.OfflinePlayer op = org.bukkit.Bukkit.getOfflinePlayer(clan.getOwner());
+                OfflinePlayer op = Bukkit.getOfflinePlayer(clan.getOwner());
                 yield op.getName() != null ? op.getName() : "Невідомо";
             }
             case "role" -> clan.isOwner(player.getUniqueId())
