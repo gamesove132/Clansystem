@@ -1,57 +1,52 @@
 package com.Clansystem.Model;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class Clan {
+
+    // id більше не final — бо може змінитись при rename
     private String id;
     private String name;
-    private UUID owner;
-    private String world;
-    private Set<UUID> members;
+    private final UUID owner;
+    private final String world;
+    private final Set<UUID> members = new HashSet<>();
     private long createdAt;
 
-    // Конструктор для ClanManager (рядок 49 та 108)
+    public Clan(String name, UUID owner, String world) {
+        this.name = name;
+        this.owner = owner;
+        this.world = world;
+        this.id = world + "_" + name.toLowerCase();
+        this.members.add(owner);
+        this.createdAt = System.currentTimeMillis();
+    }
+
+    // For loading from config
     public Clan(String id, String name, UUID owner, String world, Set<UUID> members, long createdAt) {
         this.id = id;
         this.name = name;
         this.owner = owner;
         this.world = world;
-        this.members = members != null ? members : new HashSet<>();
+        this.members.addAll(members);
         this.createdAt = createdAt;
     }
 
-    // Додатковий конструктор для створення нового клану
-    public Clan(String name, UUID owner, String world) {
-        this(UUID.randomUUID().toString().substring(0, 8), name, owner, world, new HashSet<>(), System.currentTimeMillis());
-    }
-
-    // Геттери, які вимагає помилка
     public String getId() { return id; }
+    // Оновлює і id і name при rename
+    public void setName(String name) {
+        this.name = name;
+        this.id = world + "_" + name.toLowerCase();
+    }
     public String getName() { return name; }
     public UUID getOwner() { return owner; }
     public String getWorld() { return world; }
-    public long getCreatedAt() { return createdAt; }
     public Set<UUID> getMembers() { return members; }
-    public int getSize() { return members.size() + 1; } // +1 для власника
+    public long getCreatedAt() { return createdAt; }
 
-    // Сеттери та логіка
-    public void setName(String name) { this.name = name; }
-    
-    public boolean isOwner(UUID uuid) {
-        return owner.equals(uuid);
-    }
+    public boolean isMember(UUID uuid) { return members.contains(uuid); }
+    public boolean isOwner(UUID uuid) { return owner.equals(uuid); }
 
-    public boolean isMember(UUID uuid) {
-        return members.contains(uuid) || isOwner(uuid);
-    }
-
-    public void addMember(UUID uuid) {
-        members.add(uuid);
-    }
-
-    public void removeMember(UUID uuid) {
-        members.remove(uuid);
-    }
+    public void addMember(UUID uuid) { members.add(uuid); }
+    public void removeMember(UUID uuid) { members.remove(uuid); }
+    public int getSize() { return members.size(); }
 }
