@@ -1,4 +1,4 @@
-name: Build Clansystem
+name: Build ClansPlugin
 
 on:
   push:
@@ -18,11 +18,17 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      # Видаляємо пошкоджений кеш adventure-platform-api
+      - name: Clear corrupted Maven cache
+        run: |
+          rm -rf ~/.m2/repository/net/kyori/
+          rm -rf ~/.m2/repository/io/papermc/
+
       - name: Build with Maven
-        run: mvn -B clean package --file pom.xml -Dhttp.keepAlive=false -Dmaven.wagon.http.retryHandler.count=3
+        run: mvn package -f Clansystem/pom.xml
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
-          name: Clansystem
-          path: target/*.jar
+          name: ClansPlugin
+          path: Clansystem/target/ClansPlugin-1.0.0.jar
